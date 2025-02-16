@@ -55,7 +55,7 @@ const combinedAuth = (req, res, next) => {
 
 // Session middleware
 app.use(session({
-    secret: 'bytevault-secret-key',
+    secret: 'hackedvault-secret-key',
     resave: false,
     saveUninitialized: false,
     cookie: { 
@@ -362,7 +362,7 @@ if (!fs.existsSync('./uploads')) {
 
 // Start server
 app.listen(port, '0.0.0.0', () => {
-    console.log(`ByteVault running on port ${port}`);
+    console.log(`HackedVault running on port ${port}`);
     console.log('Security Mode:', systemConfig.securityMode, process.env.SECURITY_MODE ? '(from environment)' : '(default)');
     console.log('Admin Account:', isAdminConfigured() ? 'Configured' : 'Not Configured');
 });
