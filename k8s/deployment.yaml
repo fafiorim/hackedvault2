@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bytevault-deployment
+  name: hackedvault-deployment
   labels:
-    app: bytevault
+    app: hackedvault
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: bytevault
+      app: hackedvault
   template:
     metadata:
       labels:
-        app: bytevault
+        app: hackedvault
     spec:
       containers:
-      - name: bytevault
+      - name: hackedvault
         image: ${ECR_REGISTRY}/${ECR_REPOSITORY}:latest
         ports:
         - containerPort: 3000
@@ -23,22 +23,22 @@ spec:
         - name: ADMIN_USERNAME
           valueFrom:
             configMapKeyRef:
-              name: bytevault-config
+              name: hackedvault-config
               key: admin-username
         - name: USER_USERNAME
           valueFrom:
             configMapKeyRef:
-              name: bytevault-config
+              name: hackedvault-config
               key: user-username
         - name: ADMIN_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: bytevault-secrets
+              name: hackedvault-secrets
               key: admin-password
         - name: USER_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: bytevault-secrets
+              name: hackedvault-secrets
               key: user-password
         volumeMounts:
         - name: uploads-volume
