@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: bytevault-service
+  name: hackedvault-service
   labels:
-    app: bytevault
+    app: hackedvault
 spec:
   selector:
-    app: bytevault
+    app: hackedvault
   ports:
     - name: web
       protocol: TCP
