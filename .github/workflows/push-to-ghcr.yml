@@ -1,0 +1,25 @@
+name: Push Docker Image to GHCR
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  push-to-ghcr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+
+      - name: Pull Golang Image
+        run: docker pull golang:1.21-alpine
+
+      - name: Tag and Push Image
+        run: |
+          docker tag golang:1.21-alpine ghcr.io/${{ github.repository }}/golang:1.21-alpine
+          docker push ghcr.io/${{ github.repository }}/golang:1.21-alpine
