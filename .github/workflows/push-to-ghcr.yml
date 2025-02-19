@@ -33,14 +33,14 @@ jobs:
 
       - name: Make Container Images Public
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # ✅ Set GH_TOKEN for authentication
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # ✅ Use GitHub Actions token for authentication
         run: |
           gh api --method PATCH \
             -H "Accept: application/vnd.github.v3+json" \
-            /orgs/recursivebugs/packages/container/golang \
+            /orgs/recursivebugs/packages/container/hackedvault%2Fgolang \
             -f visibility=public
 
           gh api --method PATCH \
             -H "Accept: application/vnd.github.v3+json" \
-            /orgs/recursivebugs/packages/container/alpine \
+            /orgs/recursivebugs/packages/container/hackedvault%2Falpine \
             -f visibility=public
