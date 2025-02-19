@@ -37,10 +37,10 @@ jobs:
         run: |
           gh api --method PATCH \
             -H "Accept: application/vnd.github.v3+json" \
-            /orgs/recursivebugs/packages/container/hackedvault%2Fgolang \
+            /orgs/recursivebugs/packages/container/golang \
             -f visibility=public
 
           gh api --method PATCH \
             -H "Accept: application/vnd.github.v3+json" \
-            /orgs/recursivebugs/packages/container/hackedvault%2Falpine \
+            /orgs/recursivebugs/packages/container/alpine \
             -f visibility=public
