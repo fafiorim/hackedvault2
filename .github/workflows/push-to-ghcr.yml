@@ -31,16 +31,9 @@ jobs:
           docker tag alpine:latest ghcr.io/recursivebugs/hackedvault/alpine:latest
           docker push ghcr.io/recursivebugs/hackedvault/alpine:latest
 
-      - name: Generate GitHub Actions Summary
-        run: |
-          echo "### 🚀 Pushed Container Images to GHCR" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| **Image Name** | **Repository URL** | **Digest** |" >> $GITHUB_STEP_SUMMARY
-          echo "|---------------|--------------------|------------|" >> $GITHUB_STEP_SUMMARY
-          echo "| \`golang:1.21-alpine\` | [ghcr.io/recursivebugs/hackedvault/golang:1.21-alpine](https://github.com/users/recursivebugs/packages/container/package/golang) | \`$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/recursivebugs/hackedvault/golang:1.21-alpine | cut -d '@' -f 2)\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| \`alpine:latest\` | [ghcr.io/recursivebugs/hackedvault/alpine:latest](https://github.com/users/recursivebugs/packages/container/package/alpine) | \`$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/recursivebugs/hackedvault/alpine:latest | cut -d '@' -f 2)\` |" >> $GITHUB_STEP_SUMMARY
-
       - name: Make Container Images Public
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # ✅ Set GH_TOKEN for authentication
         run: |
           gh api --method PATCH \
             -H "Accept: application/vnd.github.v3+json" \
