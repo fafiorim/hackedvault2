@@ -3,7 +3,7 @@ WORKDIR /build
 # Copy Go files
 COPY scanner.go .
 COPY go.mod go.sum ./
-# Build the scanner
+# Build the scanner.
 RUN go mod download
 RUN go build -o scanner
 
