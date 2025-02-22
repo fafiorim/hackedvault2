@@ -30,6 +30,9 @@ WORKDIR /app
 # Install Node.js and npm
 RUN apk add --update nodejs npm
 
+# Install Python and pip
+RUN apk add --no-cache python3 py3-pip
+
 # Install a Flask
 RUN pip install Flask==0.12.2
 
