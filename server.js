@@ -4,9 +4,9 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const axios = require('axios');
-// Add these two requires for HTTP/HTTPS support
 const http = require('http');
 const https = require('https');
+const cookieParser = require('cookie-parser');
 
 // Import authentication middleware
 const { 
@@ -20,7 +20,6 @@ const {
 } = require('./middleware/auth');
 
 const app = express();
-// Add port configuration
 const httpPort = process.env.HTTP_PORT || 3000;
 const httpsPort = process.env.HTTPS_PORT || 3443;
 
@@ -42,6 +41,35 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+// Trust proxy - needed for running behind load balancer
+app.set('trust proxy', 1);
+
+// Add cookie parser middleware
+app.use(cookieParser());
+
+// Session middleware
+app.use(session({
+    secret: 'hackedvault-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { 
+        secure: false, // Will be set dynamically based on protocol
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        httpOnly: true,
+        sameSite: 'lax'
+    },
+    name: 'hackedvault.sid', // Custom session cookie name
+    proxy: true // Trust the reverse proxy
+}));
+
+// Middleware to handle secure cookies behind proxy
+app.use((req, res, next) => {
+    if (req.secure || req.headers['x-forwarded-proto'] === 'https') {
+        req.session.cookie.secure = true;
+    }
+    next();
+});
+
 // Combined auth middleware
 const combinedAuth = (req, res, next) => {
     // Check for Basic Auth header
@@ -57,17 +85,6 @@ const combinedAuth = (req, res, next) => {
     // If neither, redirect to login
     res.redirect('/login');
 };
-
-// Session middleware
-app.use(session({
-    secret: 'hackedvault-secret-key',
-    resave: false,
-    saveUninitialized: false,
-    cookie: { 
-        secure: false,
-        maxAge: 24 * 60 * 60 * 1000 
-    }
-}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -365,7 +382,7 @@ if (!fs.existsSync('./uploads')) {
     fs.mkdirSync('./uploads');
 }
 
-// SSL configuration - Add this section
+// SSL configuration
 let sslOptions = null;
 try {
     sslOptions = {
@@ -376,7 +393,7 @@ try {
     console.log('SSL certificates not found, HTTPS will not be available');
 }
 
-// Create HTTP & HTTPS servers - Replace the original app.listen() with these
+// Create HTTP & HTTPS servers
 const httpServer = http.createServer(app);
 let httpsServer = null;
 
