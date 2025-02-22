@@ -25,7 +25,7 @@ ENV ADMIN_USERNAME=admin \
     FSS_API_KEY="" \
     FSS_CUSTOM_TAGS="" \
     HTTP_PORT=3000 \
-    HTTPS_PORT=3443
+    HTTPS_PORT=3443 \
     SECURITY_MODE=disabled
 
 WORKDIR /app
