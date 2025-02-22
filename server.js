@@ -4,6 +4,9 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const axios = require('axios');
+// Add these two requires for HTTP/HTTPS support
+const http = require('http');
+const https = require('https');
 
 // Import authentication middleware
 const { 
@@ -17,7 +20,9 @@ const {
 } = require('./middleware/auth');
 
 const app = express();
-const port = 3000;
+// Add port configuration
+const httpPort = process.env.HTTP_PORT || 3000;
+const httpsPort = process.env.HTTPS_PORT || 3443;
 
 // System Configuration
 let systemConfig = {
@@ -360,9 +365,32 @@ if (!fs.existsSync('./uploads')) {
     fs.mkdirSync('./uploads');
 }
 
-// Start server
-app.listen(port, '0.0.0.0', () => {
-    console.log(`HackedVault running on port ${port}`);
-    console.log('Security Mode:', systemConfig.securityMode, process.env.SECURITY_MODE ? '(from environment)' : '(default)');
-    console.log('Admin Account:', isAdminConfigured() ? 'Configured' : 'Not Configured');
+// SSL configuration - Add this section
+let sslOptions = null;
+try {
+    sslOptions = {
+        key: fs.readFileSync(path.join(__dirname, 'certs', 'private-key.pem')),
+        cert: fs.readFileSync(path.join(__dirname, 'certs', 'public-cert.pem'))
+    };
+} catch (error) {
+    console.log('SSL certificates not found, HTTPS will not be available');
+}
+
+// Create HTTP & HTTPS servers - Replace the original app.listen() with these
+const httpServer = http.createServer(app);
+let httpsServer = null;
+
+if (sslOptions) {
+    httpsServer = https.createServer(sslOptions, app);
+}
+
+// Start servers
+httpServer.listen(httpPort, '0.0.0.0', () => {
+    console.log(`HackedVault HTTP server running on port ${httpPort}`);
 });
+
+if (httpsServer) {
+    httpsServer.listen(httpsPort, '0.0.0.0', () => {
+        console.log(`HackedVault HTTPS server running on port ${httpsPort}`);
+    });
+}
