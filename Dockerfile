@@ -14,7 +14,7 @@ RUN go build -o scanner
 # Final image
 # Alternative Base Image: Use a GHCR-hosted image instead of Docker Hub
 # FROM ghcr.io/recursivebugs/hackedvault/alpine:latest
-FROM alpine:latest
+FROM alpine:3.15
 
 # Set environment variables with defaults
 ENV ADMIN_USERNAME=admin \
@@ -30,11 +30,8 @@ WORKDIR /app
 # Install Node.js and npm
 RUN apk add --update nodejs npm
 
-# Install Python and pip
-RUN apk add --no-cache python3 py3-pip
-
-# Install a Flask
-RUN pip install Flask==0.12.2
+# Install libssl
+RUN apk add --no-cache libssl1.1
 
 # HANA DB config file
 RUN echo "WDVPIVAlUEBbNFxcUFpYNTQoUF4pN0NDKTd9JEVJQ0FSLVNUQU5EQVJELU" | \
