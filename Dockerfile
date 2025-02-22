@@ -52,10 +52,13 @@ COPY --from=scanner-builder /build/scanner /app/scanner
 COPY package*.json ./
 RUN npm install && npm install selfsigned
 
-# Copy all application files first
+# Copy all application files
 COPY . .
 
-# Generate SSL certificates after files are copied
+# Set execute permissions for start.sh and scanner
+RUN chmod +x start.sh scanner
+
+# Generate SSL certificates
 RUN node generate-cert.js
 
 # Expose both HTTP and HTTPS ports
