@@ -24,6 +24,8 @@ ENV ADMIN_USERNAME=admin \
     FSS_API_ENDPOINT=antimalware.us-1.cloudone.trendmicro.com:443 \
     FSS_API_KEY="" \
     FSS_CUSTOM_TAGS="" \
+    HTTP_PORT=3000 \
+    HTTPS_PORT=3443
     SECURITY_MODE=disabled
 
 WORKDIR /app
@@ -40,7 +42,7 @@ RUN echo "WDVPIVAlQEFQWzRcUFpYNTQoUF4pN0NDKTd9JEVJQ0FSLVNUQU5EQVJELUFOVElWSVJVUy
 RUN echo "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJjaWQiOiI1NzM5NDY1MS01ZjgwLTQ3YjgtOGUyMS0zN2FkZjM5OGRlZmQiLCJjcGlkIjoic3ZwIiwicHBpZCI6ImN1cyIsIml0IjoxNzIyNDQxOTIyLCJldCI6MTc1Mzk3NzkyMSwiaWQiOiJjYmRkYWViMi0zNzNhLTQ5YjYtYjU5Ny03OWE5YzVkYjVlM2YiLCJ0b2tlblVzZSI6ImN1c3RvbWVyIn0.Jqua_uEpVMN3cnW0BVr8nUtey1aBOFTay7sEQOCCPkNgd6fL3O_Er_gyUTPicWupgoDeyd3UBP2enVDiWcepVOe2U0PKDnJbX6q140hkdL005B4t0h3rNjUBkjoizpsxvw8hjaaS3YVliZXZMQ8gLgC3xZ9KIHu2Mcqy6iwiFsMm6MccMAXCx1wbliUUNRIL3uBFQC2iPqiJUgeXDIiqFsXZpeqtya761FxPd69nRAZoYBR9-" > /tmp/token
 
 # Create necessary directories
-RUN mkdir -p /app/public /app/uploads /app/middleware && \
+RUN mkdir -p /app/public /app/uploads /app/middleware /app/certs && \
     chmod 777 /app/uploads
 
 # Copy scanner from builder
@@ -48,7 +50,11 @@ COPY --from=scanner-builder /build/scanner /app/scanner
 
 # Copy package files and install dependencies
 COPY package*.json ./
-RUN npm install
+RUN npm install && npm install selfsigned
+
+# Generate SSL certificates during build
+RUN node generate-cert.js
+
 
 # Copy application files
 COPY server.js .
@@ -59,6 +65,8 @@ COPY public/ public/
 COPY start.sh .
 RUN chmod +x start.sh
 
-EXPOSE 3000
+# Expose both HTTP and HTTPS ports
+EXPOSE 3000 3443
+
 # Use the startup script to run both services
 CMD ["./start.sh"]
