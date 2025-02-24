@@ -97,8 +97,8 @@ const storeScanResult = (result) => {
     }
 };
 
-// API Endpoints
-app.post('/upload', (req, res, next) => {
+// API Endpoints - Move to /api prefix
+app.post('/api/upload', (req, res, next) => {
     // Run basic auth first
     basicAuth(req, res, () => {
         // After auth passes, run multer
@@ -252,7 +252,7 @@ app.post('/upload', (req, res, next) => {
     });
 });
 
-app.get('/files', basicAuth, (req, res) => {
+app.get('/api/files', basicAuth, (req, res) => {
     try {
         fs.readdir('./uploads', (err, files) => {
             if (err) {
@@ -275,7 +275,7 @@ app.get('/files', basicAuth, (req, res) => {
     }
 });
 
-app.delete('/files/:filename', basicAuth, (req, res) => {
+app.delete('/api/files/:filename', basicAuth, (req, res) => {
     try {
         const filepath = path.join('./uploads', req.params.filename);
         if (!fs.existsSync(filepath)) {
@@ -318,7 +318,7 @@ app.post('/api/config', combinedAuth, adminAuth, (req, res) => {
     }
 });
 
-app.get('/health', basicAuth, (req, res) => {
+app.get('/api/health', basicAuth, (req, res) => {
     res.json({
         status: 'healthy',
         timestamp: new Date().toISOString(),
@@ -335,6 +335,23 @@ app.get('/health', basicAuth, (req, res) => {
 
 app.get('/api/scan-results', basicAuth, (req, res) => {
     res.json(scanResults);
+});
+
+// Legacy endpoints for backward compatibility
+app.post('/upload', (req, res) => {
+    res.redirect(307, '/api/upload'); // 307 preserves the HTTP method
+});
+
+app.get('/files', basicAuth, (req, res) => {
+    res.redirect('/api/files');
+});
+
+app.delete('/files/:filename', basicAuth, (req, res) => {
+    res.redirect(307, `/api/files/${req.params.filename}`);
+});
+
+app.get('/health', basicAuth, (req, res) => {
+    res.redirect('/api/health');
 });
 
 // Static files and web routes
